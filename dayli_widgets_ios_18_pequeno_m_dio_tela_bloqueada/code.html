@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dayli — Widgets iOS 18 (Home & Lock Screen)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .widget-glass {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 10px 30px -5px rgba(53, 49, 60, 0.08), 0 2px 6px -1px rgba(53, 49, 60, 0.04);
+    }
+    .lockscreen-glass {
+      background: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-[#F8F5F0] text-[#35313C] min-h-screen pb-16">
+
+  <!-- Header / Navigation Bar da Apresentação -->
+  <header class="sticky top-0 z-40 bg-[#F8F5F0]/90 backdrop-blur-md border-b border-[#35313C]/5 px-5 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-full bg-[#35313C] text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
+        D
+      </div>
+      <div>
+        <h1 class="text-xs font-semibold uppercase tracking-wider text-[#35313C]/60">Dayli • iOS 18 Extension</h1>
+        <p class="text-sm font-bold text-[#35313C]">Widgets da Tela de Início & Bloqueio</p>
+      </div>
+    </div>
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#A3B8A6]/20 text-[#2D5A38]">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#3D784D] animate-pulse"></span>
+      Sincronizado
+    </span>
+  </header>
+
+  <main class="max-w-md mx-auto px-5 pt-6 space-y-9">
+
+    <!-- Introdução Serene -->
+    <div class="space-y-1">
+      <div class="inline-flex items-center gap-1.5 text-xs font-medium text-[#35313C]/60 uppercase tracking-wider">
+        <svg class="w-3.5 h-3.5 text-[#B8A3CE]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        Integração Sem Fio com iOS
+      </div>
+      <h2 class="text-2xl font-bold tracking-tight text-[#35313C]">Visão rápida, mente serena.</h2>
+      <p class="text-sm text-[#35313C]/70 leading-relaxed">
+        Acompanhe seus pilares, o próximo foco e cadência diária diretamente da Home Screen ou da Tela Bloqueada, sem abrir o app.
+      </p>
+    </div>
+
+    <!-- SEÇÃO 1: WIDGET PEQUENO (Small Widget - 2x2) -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-xs font-semibold text-[#35313C]/50 uppercase tracking-wider">Tamanho Pequeno (2×2)</span>
+          <h3 class="text-base font-bold text-[#35313C]">Flor da Vida & Próximo Foco</h3>
+        </div>
+        <span class="text-xs text-[#35313C]/50 font-medium">160 × 160 pt</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Variação 1: Flor da Vida & Ritmo -->
+        <div class="widget-glass rounded-[26px] p-3.5 border border-[#35313C]/5 flex flex-col justify-between aspect-square relative overflow-hidden group">
+          <!-- Top Row -->
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#35313C]/60 uppercase tracking-wider">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#A3B8A6]"></span>
+              Equilíbrio
+            </span>
+            <span class="text-[11px] font-bold text-[#35313C]">84%</span>
+          </div>
+
+          <!-- Flor da Vida Central Compacta -->
+          <div class="flex items-center justify-center my-auto relative">
+            <svg class="w-16 h-16 drop-shadow-sm" viewBox="0 0 100 100" fill="none">
+              <!-- Pétala Superior (Trabalho - Azul pastel) -->
+              <ellipse cx="50" cy="30" rx="9" ry="20" fill="#9FB5CC" opacity="0.9" />
+              <!-- Pétala Inferior (Saúde - Verde Sálvia) -->
+              <ellipse cx="50" cy="70" rx="9" ry="20" fill="#A3B8A6" opacity="0.9" />
+              <!-- Pétala Esquerda (Vida Pessoal - Rosa Queimado) -->
+              <ellipse cx="30" cy="50" rx="20" ry="9" fill="#D69EAA" opacity="0.9" />
+              <!-- Pétala Direita (Estudos - Lavanda) -->
+              <ellipse cx="70" cy="50" rx="20" ry="9" fill="#B8A3CE" opacity="0.9" />
+              <!-- Núcleo central -->
+              <circle cx="50" cy="50" r="4.5" fill="#35313C" />
+            </svg>
+          </div>
+
+          <!-- Bottom Row -->
+          <div class="pt-1 border-t border-[#35313C]/5">
+            <p class="text-[11px] font-bold text-[#35313C] leading-none">Ritmo Serena</p>
+            <p class="text-[10px] text-[#35313C]/60 mt-0.5">4 de 5 rituais ativos</p>
+          </div>
+        </div>
+
+        <!-- Variação 2: Próximo Compromisso & Tempo -->
+        <div class="widget-glass rounded-[26px] p-3.5 border border-[#35313C]/5 flex flex-col justify-between aspect-square relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1 text-[10px] font-semibold text-[#A3B8A6] uppercase tracking-wider">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#B8A3CE]"></span>
+              Hoje • 10:30
+            </div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-[#35313C]/5 font-semibold text-[#35313C]/70">Em 45m</span>
+          </div>
+
+          <div class="my-auto space-y-1.5">
+            <div class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#9FB5CC]/25 text-[#2C4863]">
+              Banco & Finanças
+            </div>
+            <h4 class="text-xs font-bold text-[#35313C] leading-snug line-clamp-2">
+              Reunião de Fechamento Contábil
+            </h4>
+            <p class="text-[10px] text-[#35313C]/60 flex items-center gap-1">
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              Sala Virtual Executiva
+            </p>
+          </div>
+
+          <div class="pt-1.5 border-t border-[#35313C]/5 flex items-center justify-between text-[10px]">
+            <span class="text-[#35313C]/60">Depois:</span>
+            <span class="font-medium text-[#D69EAA]">Pausa Almoço ✨</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: WIDGET MÉDIO (Medium Widget - 4x2) -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-xs font-semibold text-[#35313C]/50 uppercase tracking-wider">Tamanho Médio (4×2)</span>
+          <h3 class="text-base font-bold text-[#35313C]">Panorama do Dia & Timeline</h3>
+        </div>
+        <span class="text-xs text-[#35313C]/50 font-medium">338 × 160 pt</span>
+      </div>
+
+      <!-- Widget Médio Principal -->
+      <div class="widget-glass rounded-[26px] p-4 border border-[#35313C]/5 shadow-sm space-y-3">
+        <!-- Cabeçalho do Widget -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#B8A3CE]"></span>
+            <span class="text-xs font-bold text-[#35313C]">Dayli • Terça, 24 de Out</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-semibold text-[#35313C]/70">3 de 6 concluídas</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#A3B8A6]/20 font-bold text-[#2E5E3A]">50%</span>
+          </div>
+        </div>
+
+        <!-- Grade de 2 Colunas internas do Widget Médio -->
+        <div class="grid grid-cols-2 gap-3.5 pt-1">
+          <!-- Coluna 1: Próximo Bloco Ativo -->
+          <div class="bg-[#F8F5F0]/70 rounded-xl p-2.5 border border-[#35313C]/5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-[10px] text-[#35313C]/60 mb-1">
+                <span class="font-bold text-[#9FB5CC]">10:30 • 45 min</span>
+                <span class="font-semibold text-amber-700 bg-amber-50 px-1 rounded">Foco Alto</span>
+              </div>
+              <p class="text-xs font-bold text-[#35313C] leading-snug">
+                Reunião Fechamento Contábil
+              </p>
+              <p class="text-[10px] text-[#35313C]/60 mt-1 line-clamp-1">
+                Apresentar balancete Q3
+              </p>
+            </div>
+            
+            <div class="mt-2 pt-1.5 border-t border-[#35313C]/5 flex items-center justify-between">
+              <span class="text-[9px] font-medium text-[#35313C]/50">Micropausa IA:</span>
+              <span class="text-[9px] font-bold text-[#A3B8A6]">+15m respiro</span>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Lista dos próximos itens -->
+          <div class="space-y-1.5 flex flex-col justify-center">
+            <!-- Item 1 -->
+            <div class="flex items-center gap-2 p-1.5 rounded-lg bg-white/70 border border-[#35313C]/5">
+              <div class="w-1.5 h-6 rounded-full bg-[#D69EAA]"></div>
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-[#35313C] truncate">Almoço nutritivo</p>
+                <p class="text-[9px] text-[#35313C]/50">12:30 • Pausa calma</p>
+              </div>
+              <span class="text-[10px] text-[#35313C]/40">1h</span>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="flex items-center gap-2 p-1.5 rounded-lg bg-white/70 border border-[#35313C]/5">
+              <div class="w-1.5 h-6 rounded-full bg-[#A3B8A6]"></div>
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-[#35313C] truncate">Treino Funcional</p>
+                <p class="text-[9px] text-[#35313C]/50">18:30 • Academia</p>
+              </div>
+              <span class="text-[10px] text-[#35313C]/40">50m</span>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="flex items-center gap-2 p-1.5 rounded-lg bg-white/70 border border-[#35313C]/5">
+              <div class="w-1.5 h-6 rounded-full bg-[#B8A3CE]"></div>
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-bold text-[#35313C] truncate">Especialização IFRS</p>
+                <p class="text-[9px] text-[#35313C]/50">20:00 • Módulo 04</p>
+              </div>
+              <span class="text-[10px] text-[#35313C]/40">1h15</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso Suave e Acolhedora -->
+        <div class="space-y-1 pt-0.5">
+          <div class="w-full bg-[#35313C]/5 h-1.5 rounded-full overflow-hidden flex">
+            <div class="bg-[#9FB5CC] h-full" style="width: 25%"></div>
+            <div class="bg-[#A3B8A6] h-full" style="width: 20%"></div>
+            <div class="bg-[#B8A3CE] h-full" style="width: 5%"></div>
+          </div>
+          <div class="flex justify-between text-[9px] text-[#35313C]/50">
+            <span>Ritmo consciente sem correria</span>
+            <span class="font-medium text-[#35313C]/80">3 restantes</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: WIDGETS DA TELA BLOQUEADA (iOS 18 Lock Screen) -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-xs font-semibold text-[#35313C]/50 uppercase tracking-wider">Tela de Bloqueio (Lock Screen)</span>
+          <h3 class="text-base font-bold text-[#35313C]">Widgets Monocromáticos e Glanceable</h3>
+        </div>
+        <span class="text-xs text-[#35313C]/50 font-medium">Design iOS 18</span>
+      </div>
+
+      <!-- Mockup Lock Screen Surface escurecida com wallpaper sereno -->
+      <div class="rounded-[30px] p-5 bg-gradient-to-b from-[#2B2930] via-[#35313C] to-[#1E1C22] text-white relative shadow-xl overflow-hidden">
+        
+        <!-- Wallpaper sutil no fundo -->
+        <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-[#B8A3CE]/10 blur-2xl pointer-events-none"></div>
+        <div class="absolute -left-10 -bottom-10 w-48 h-48 rounded-full bg-[#A3B8A6]/10 blur-2xl pointer-events-none"></div>
+
+        <!-- Lock Screen Header (Data & Hora) -->
+        <div class="text-center space-y-0.5 mb-6 relative">
+          <!-- Widget Circular Inline acima da hora -->
+          <div class="inline-flex items-center gap-1.5 text-xs text-white/80 font-medium tracking-tight">
+            <span>Terça-feira, 24 de outubro</span>
+            <span class="text-white/40">•</span>
+            <span class="inline-flex items-center gap-1 text-[#A3B8A6]">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              84% Equilíbrio
+            </span>
+          </div>
+
+          <!-- Relógio iOS Typografia Grande -->
+          <div class="text-6xl font-light tracking-tight text-white/95" style="letter-spacing: -0.04em;">
+            09:41
+          </div>
+        </div>
+
+        <!-- Área de Widgets da Lock Screen (Grid de Widgets) -->
+        <div class="space-y-2.5 relative">
+          <p class="text-[10px] uppercase font-bold tracking-widest text-white/40 text-center">Área de Widgets</p>
+          
+          <div class="grid grid-cols-3 gap-2.5">
+
+            <!-- 1. Circular Widget: Flor da Vida / Harmonia -->
+            <div class="lockscreen-glass rounded-2xl p-2.5 flex flex-col items-center justify-center text-center aspect-square">
+              <!-- Círculo de progresso com SVG Monocromático -->
+              <div class="relative w-8 h-8 flex items-center justify-center">
+                <svg class="w-8 h-8 -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-white/20" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="text-white" stroke-dasharray="84, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span class="absolute text-[9px] font-bold text-white">84%</span>
+              </div>
+              <span class="text-[9px] font-semibold text-white/80 mt-1">Harmonia</span>
+            </div>
+
+            <!-- 2. Circular Widget: Hidratação / Rituais -->
+            <div class="lockscreen-glass rounded-2xl p-2.5 flex flex-col items-center justify-center text-center aspect-square">
+              <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+              </div>
+              <span class="text-[9px] font-bold text-white mt-1">2.1L / 2.5L</span>
+              <span class="text-[8px] text-white/60">Água Hoje</span>
+            </div>
+
+            <!-- 3. Circular Widget: Modo Preservação de Energia -->
+            <div class="lockscreen-glass rounded-2xl p-2.5 flex flex-col items-center justify-center text-center aspect-square">
+              <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <span class="text-[9px] font-bold text-white mt-1">Ritmo Leve</span>
+              <span class="text-[8px] text-white/60">Sem Pressa</span>
+            </div>
+          </div>
+
+          <!-- Lock Screen Rectangular Widget (2 Colunas de largura) -->
+          <div class="lockscreen-glass rounded-2xl p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-white font-bold text-xs">
+                10:30
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white leading-tight">Reunião Banco Q3</p>
+                <p class="text-[10px] text-white/70">Em 45m • Seguido de 15m respiro</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/15 text-white/90 font-medium">3/6 Feitas</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Lock Screen Footer Prompt -->
+        <div class="mt-6 flex justify-between items-center text-white/60 text-xs px-2">
+          <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <span class="text-[11px] font-medium tracking-wide">Deslize para cima para abrir</span>
+          <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: CONFIGURAÇÕES E PERSONALIZAÇÃO DE WIDGETS -->
+    <section class="bg-white rounded-2xl p-4 border border-[#35313C]/10 space-y-3">
+      <div class="flex items-center gap-2 text-xs font-bold text-[#35313C]">
+        <svg class="w-4 h-4 text-[#A3B8A6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        Personalização pelo Usuário no iOS
+      </div>
+      
+      <div class="space-y-2 text-xs text-[#35313C]/80 divide-y divide-[#35313C]/5">
+        <div class="pt-1 flex items-center justify-between">
+          <span>Ocultar reuniões sigilosas quando bloqueado</span>
+          <span class="font-semibold text-[#A3B8A6]">Ativado</span>
+        </div>
+        <div class="pt-2 flex items-center justify-between">
+          <span>Feedback de Micropausa automática</span>
+          <span class="font-semibold text-[#A3B8A6]">Ativado</span>
+        </div>
+        <div class="pt-2 flex items-center justify-between">
+          <span>Atualização em Segundo Plano</span>
+          <span class="font-semibold text-[#35313C]">Tempo Real (WidgetKit)</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Xcode / XcodeGen
+*.xcodeproj
+xcuserdata/
+DerivedData/
+*.xcuserstate
+.build/
+.swiftpm/
+Packages/DayliCore/.build/
+
+# Gerados pelo XcodeGen a partir do project.yml
+Dayli/Resources/Info.plist
+Dayli/Resources/Dayli.entitlements
+DayliWidgets/Info.plist
+DayliWidgets/DayliWidgets.entitlements
+
+# Segredos — nunca versionar
+*.env
+Secrets.xcconfig
+*.p8
+*.p12
+
+.DS_Store

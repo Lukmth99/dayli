@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dayli — Escolha suas Dimensões</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #F8F5F0;
+      color: #35313C;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .safe-top { padding-top: env(safe-area-inset-top, 54px); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 38px); }
+  </style>
+</head>
+<body class="flex justify-center bg-[#eae7e1] min-h-screen">
+  <div class="w-full max-w-[393px] min-h-[852px] bg-[#F8F5F0] flex flex-col justify-between safe-top safe-bottom px-6 py-4 shadow-2xl relative overflow-hidden select-none">
+    
+    <!-- Top Bar with Step Indicators & Back Button -->
+    <div class="flex items-center justify-between pt-2">
+      <button class="w-9 h-9 rounded-full bg-white/70 border border-[#35313C]/5 flex items-center justify-center text-[#35313C] hover:bg-white transition-all shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <!-- Progress Pill Dots -->
+      <div class="flex items-center gap-1.5">
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/30"></div>
+        <div class="w-7 h-1.5 rounded-full bg-[#35313C] transition-all"></div>
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/20"></div>
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/20"></div>
+      </div>
+
+      <span class="text-xs font-medium text-[#7A757F] px-1">Passo 2 de 4</span>
+    </div>
+
+    <!-- Title & Guidance -->
+    <div class="pt-5 pb-3">
+      <span class="text-[11px] font-semibold tracking-wider uppercase text-[#7A757F] bg-[#35313C]/5 px-2.5 py-0.5 rounded-full inline-block mb-1.5">
+        Dimensões Pessoais
+      </span>
+      <h2 class="text-[26px] font-bold text-[#35313C] tracking-tight leading-snug">
+        O que faz parte da sua rotina atual?
+      </h2>
+      <p class="text-[13px] text-[#7A757F] pt-1">
+        Escolha as áreas prioritárias que o Dayli deve harmonizar para você. Você poderá ajustar a qualquer momento.
+      </p>
+    </div>
+
+    <!-- Selection Cards Grid -->
+    <div class="space-y-2.5 my-auto overflow-y-auto max-h-[460px] pr-0.5">
+
+      <!-- Item 1: Trabalho & Carreira (Selected) -->
+      <div class="p-3.5 rounded-2xl bg-white border-2 border-[#35313C] shadow-sm flex items-center justify-between cursor-pointer transition-all">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#E8EEF5] flex items-center justify-center text-lg text-[#406882]">
+            💼
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[14px] font-bold text-[#35313C]">Trabalho & Finanças</span>
+              <span class="text-[9px] font-semibold bg-[#406882]/10 text-[#406882] px-1.5 py-0.5 rounded">Banco</span>
+            </div>
+            <p class="text-[11px] text-[#7A757F]">Expediente, reuniões e entregas prioritárias</p>
+          </div>
+        </div>
+        <div class="w-5 h-5 rounded-full bg-[#35313C] flex items-center justify-center text-white text-[10px]">
+          ✓
+        </div>
+      </div>
+
+      <!-- Item 2: Estudos & Pós / CFA (Selected) -->
+      <div class="p-3.5 rounded-2xl bg-white border-2 border-[#35313C] shadow-sm flex items-center justify-between cursor-pointer transition-all">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#F0EBF7] flex items-center justify-center text-lg text-[#886FAD]">
+            📚
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[14px] font-bold text-[#35313C]">Estudos & Carreira</span>
+              <span class="text-[9px] font-semibold bg-[#B8A3CE]/20 text-[#886FAD] px-1.5 py-0.5 rounded">Contabilidade</span>
+            </div>
+            <p class="text-[11px] text-[#7A757F]">Aulas, leituras, provas e certificações</p>
+          </div>
+        </div>
+        <div class="w-5 h-5 rounded-full bg-[#35313C] flex items-center justify-center text-white text-[10px]">
+          ✓
+        </div>
+      </div>
+
+      <!-- Item 3: Saúde & Treinos (Selected) -->
+      <div class="p-3.5 rounded-2xl bg-white border-2 border-[#35313C] shadow-sm flex items-center justify-between cursor-pointer transition-all">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#ECF3ED] flex items-center justify-center text-lg text-[#527958]">
+            🏃‍♀️
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[14px] font-bold text-[#35313C]">Saúde & Movimento</span>
+              <span class="text-[9px] font-semibold bg-[#A3B8A6]/25 text-[#527958] px-1.5 py-0.5 rounded">Vitalidade</span>
+            </div>
+            <p class="text-[11px] text-[#7A757F]">Academia, água, sono e descanso físico</p>
+          </div>
+        </div>
+        <div class="w-5 h-5 rounded-full bg-[#35313C] flex items-center justify-center text-white text-[10px]">
+          ✓
+        </div>
+      </div>
+
+      <!-- Item 4: Vida Pessoal & Lazer (Selected) -->
+      <div class="p-3.5 rounded-2xl bg-white border-2 border-[#35313C] shadow-sm flex items-center justify-between cursor-pointer transition-all">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#FAEDEF] flex items-center justify-center text-lg text-[#AD6878]">
+            🌷
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[14px] font-bold text-[#35313C]">Vida Pessoal & Afeto</span>
+              <span class="text-[9px] font-semibold bg-[#D69EAA]/25 text-[#AD6878] px-1.5 py-0.5 rounded">Conexão</span>
+            </div>
+            <p class="text-[11px] text-[#7A757F]">Família, amigos, autocuidado e lazer</p>
+          </div>
+        </div>
+        <div class="w-5 h-5 rounded-full bg-[#35313C] flex items-center justify-center text-white text-[10px]">
+          ✓
+        </div>
+      </div>
+
+      <!-- Item 5: Projetos Pessoais & Metas (Unselected Option) -->
+      <div class="p-3.5 rounded-2xl bg-white/70 border border-[#35313C]/10 flex items-center justify-between cursor-pointer hover:bg-white transition-all opacity-80">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#F6F3EE] flex items-center justify-center text-lg text-[#7A757F]">
+            ✨
+          </div>
+          <div>
+            <span class="text-[14px] font-medium text-[#35313C]">Finanças & Metas Pessoais</span>
+            <p class="text-[11px] text-[#7A757F]">Investimentos, poupança e novos projetos</p>
+          </div>
+        </div>
+        <div class="w-5 h-5 rounded-full border-2 border-[#35313C]/20 bg-transparent"></div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="pt-3 space-y-2">
+      <div class="flex items-center justify-between bg-white/60 px-3.5 py-2 rounded-xl border border-[#35313C]/5 text-[11px] text-[#7A757F]">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#A3B8A6]"></span>
+          <span>4 dimensões ativas para equilibrar</span>
+        </div>
+        <span class="font-medium text-[#35313C]">Excelente equilíbrio</span>
+      </div>
+
+      <button class="w-full bg-[#35313C] hover:bg-[#25222b] text-white py-4 px-6 rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-[#35313C]/10 active:scale-[0.99] transition-all">
+        <span>Continuar</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</body>
+</html>

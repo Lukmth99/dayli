@@ -1,0 +1,121 @@
+# Gere o projeto no Mac com:  brew install xcodegen && xcodegen generate
+# Ajuste DEVELOPMENT_TEAM e, se necessário, os bundle identifiers / App Group.
+name: Dayli
+options:
+  bundleIdPrefix: app.dayli
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: pt-BR
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_STRICT_CONCURRENCY: minimal
+
+packages:
+  DayliCore:
+    path: Packages/DayliCore
+
+targets:
+  Dayli:
+    type: application
+    platform: iOS
+    sources:
+      - path: Dayli
+    dependencies:
+      - package: DayliCore
+      - target: DayliWidgets
+    entitlements:
+      path: Dayli/Resources/Dayli.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.app.dayli.shared
+        com.apple.developer.default-data-protection: NSFileProtectionCompleteUntilFirstUserAuthentication
+    info:
+      path: Dayli/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Dayli
+        CFBundleDevelopmentRegion: pt-BR
+        CFBundleLocalizations: [pt-BR]
+        UILaunchScreen:
+          UIColorName: ""
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        NSCalendarsFullAccessUsageDescription: "O Dayli mostra seus compromissos do Calendário junto com suas tarefas e evita sugerir horários ocupados. Nada é alterado sem sua confirmação."
+        NSCalendarsWriteOnlyAccessUsageDescription: "O Dayli pode adicionar ao seu Calendário os compromissos que você criar no app."
+        NSPhotoLibraryUsageDescription: "Usado apenas se você escolher uma foto de perfil."
+        DayliAppGroupIdentifier: group.app.dayli.shared
+        # URL do backend de IA (vazio = IA remota indisponível). Nunca coloque chaves de provedores aqui.
+        DayliAIBackendURL: ""
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.dayli.ios
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+
+  DayliWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: DayliWidgets
+    dependencies:
+      - package: DayliCore
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    entitlements:
+      path: DayliWidgets/DayliWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.app.dayli.shared
+    info:
+      path: DayliWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Dayli
+        DayliAppGroupIdentifier: group.app.dayli.shared
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.dayli.ios.widgets
+
+  DayliTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: DayliTests
+    dependencies:
+      - target: Dayli
+      - package: DayliCore
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+
+  DayliUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: DayliUITests
+    dependencies:
+      - target: Dayli
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Dayli:
+    build:
+      targets:
+        Dayli: all
+        DayliWidgets: all
+    test:
+      targets:
+        - DayliTests
+        - DayliUITests
+      gatherCoverageData: true

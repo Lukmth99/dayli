@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dayli — Boas-vindas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dayli: {
+              cream: '#F8F5F0',
+              lavender: '#B8A3CE',
+              rose: '#D69EAA',
+              sage: '#A3B8A6',
+              graphite: '#35313C',
+              sand: '#EFECE6',
+              muted: '#7A757F',
+              card: '#FFFFFF'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #F8F5F0;
+      color: #35313C;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .safe-top { padding-top: env(safe-area-inset-top, 54px); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 38px); }
+  </style>
+</head>
+<body class="flex justify-center bg-[#eae7e1] min-h-screen">
+  <div class="w-full max-w-[393px] min-h-[852px] bg-[#F8F5F0] flex flex-col justify-between safe-top safe-bottom px-6 py-4 shadow-2xl relative overflow-hidden select-none">
+    
+    <!-- Top Bar with Step Indicators & Skip -->
+    <div class="flex items-center justify-between pt-2">
+      <!-- Progress Pill Dots -->
+      <div class="flex items-center gap-1.5">
+        <div class="w-7 h-1.5 rounded-full bg-[#35313C] transition-all"></div>
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/20"></div>
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/20"></div>
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/20"></div>
+      </div>
+      <button class="text-xs font-medium tracking-tight text-[#7A757F] hover:text-[#35313C] transition-colors py-1 px-2.5 rounded-full bg-white/50 border border-[#35313C]/5">
+        Pular
+      </button>
+    </div>
+
+    <!-- Center Visual & Brand Essence -->
+    <div class="my-auto flex flex-col items-center text-center">
+      
+      <!-- Organic Gentle Blossom Motif (Flor da Vida / Ritmo) -->
+      <div class="relative w-48 h-48 mb-8 flex items-center justify-center">
+        <!-- Soft decorative background glow -->
+        <div class="absolute inset-0 bg-gradient-to-tr from-[#B8A3CE]/25 via-[#D69EAA]/20 to-[#A3B8A6]/25 rounded-full blur-2xl"></div>
+        
+        <!-- Animated / Illustrated Minimal SVG Graphic -->
+        <svg class="w-40 h-40 relative z-10 drop-shadow-sm" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Petal North (Sage) -->
+          <ellipse cx="100" cy="58" rx="20" ry="38" fill="#A3B8A6" fill-opacity="0.85" />
+          <!-- Petal South (Sage) -->
+          <ellipse cx="100" cy="142" rx="20" ry="38" fill="#A3B8A6" fill-opacity="0.85" />
+          <!-- Petal East (Lavender) -->
+          <ellipse cx="142" cy="100" rx="38" ry="20" fill="#B8A3CE" fill-opacity="0.85" />
+          <!-- Petal West (Rose) -->
+          <ellipse cx="58" cy="100" rx="38" ry="20" fill="#D69EAA" fill-opacity="0.85" />
+          
+          <!-- Outer gentle cadence rings -->
+          <circle cx="100" cy="100" r="74" stroke="#35313C" stroke-opacity="0.08" stroke-dasharray="4 4" stroke-width="1.5" />
+          <circle cx="100" cy="100" r="88" stroke="#A3B8A6" stroke-opacity="0.2" stroke-width="1" />
+          
+          <!-- Center Core Dot -->
+          <circle cx="100" cy="100" r="14" fill="#FFFFFF" />
+          <circle cx="100" cy="100" r="7" fill="#35313C" />
+          <circle cx="100" cy="100" r="2.5" fill="#F8F5F0" />
+        </svg>
+
+        <!-- Floating subtle badges -->
+        <div class="absolute -top-1 -right-2 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full shadow-sm border border-[#35313C]/5 flex items-center gap-1.5 animate-pulse">
+          <span class="w-2 h-2 rounded-full bg-[#A3B8A6]"></span>
+          <span class="text-[11px] font-medium text-[#35313C]">Sem pressa</span>
+        </div>
+        <div class="absolute -bottom-2 -left-2 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full shadow-sm border border-[#35313C]/5 flex items-center gap-1.5">
+          <span class="text-[12px]">✨</span>
+          <span class="text-[11px] font-medium text-[#35313C]">No seu ritmo</span>
+        </div>
+      </div>
+
+      <!-- Wordmark & Headline -->
+      <div class="space-y-2 max-w-[320px]">
+        <span class="text-[11px] font-semibold tracking-widest uppercase text-[#7A757F] bg-[#35313C]/5 px-3 py-1 rounded-full inline-block">
+          Dayli • Organização Consciente
+        </span>
+        <h1 class="text-[32px] font-bold text-[#35313C] tracking-tight leading-tight">
+          Sua vida, no seu ritmo.
+        </h1>
+        <p class="text-[15px] text-[#7A757F] leading-relaxed font-normal pt-1">
+          Concilie carreira, estudos, treinos e descanso sem estresse e sem a sensação de estar sempre devendo algo.
+        </p>
+      </div>
+
+      <!-- Feature Pill Preview -->
+      <div class="grid grid-cols-3 gap-2 w-full mt-7">
+        <div class="bg-white/80 border border-[#35313C]/5 rounded-2xl p-2.5 text-center flex flex-col items-center">
+          <div class="w-8 h-8 rounded-full bg-[#A3B8A6]/20 flex items-center justify-center text-sm mb-1.5">
+            🌿
+          </div>
+          <span class="text-[11px] font-semibold text-[#35313C]">Equilíbrio</span>
+          <span class="text-[9px] text-[#7A757F]">Sem sobrecarga</span>
+        </div>
+        <div class="bg-white/80 border border-[#35313C]/5 rounded-2xl p-2.5 text-center flex flex-col items-center">
+          <div class="w-8 h-8 rounded-full bg-[#B8A3CE]/20 flex items-center justify-center text-sm mb-1.5">
+            ✨
+          </div>
+          <span class="text-[11px] font-semibold text-[#35313C]">Dayli AI</span>
+          <span class="text-[9px] text-[#7A757F]">Sugestões gentis</span>
+        </div>
+        <div class="bg-white/80 border border-[#35313C]/5 rounded-2xl p-2.5 text-center flex flex-col items-center">
+          <div class="w-8 h-8 rounded-full bg-[#D69EAA]/20 flex items-center justify-center text-sm mb-1.5">
+            🌸
+          </div>
+          <span class="text-[11px] font-semibold text-[#35313C]">Descanso</span>
+          <span class="text-[9px] text-[#7A757F]">Respiro protegido</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="space-y-3 pt-4">
+      <button class="w-full bg-[#35313C] hover:bg-[#25222b] text-white py-4 px-6 rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-[#35313C]/10 active:scale-[0.99] transition-all">
+        <span>Começar minha jornada</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </button>
+
+      <div class="text-center">
+        <p class="text-[11px] text-[#7A757F]">
+          Já possui conta? <a href="#" class="font-semibold text-[#35313C] underline underline-offset-2">Entrar com Apple</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

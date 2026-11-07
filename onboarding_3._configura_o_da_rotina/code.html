@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dayli — Configuração da Rotina</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #F8F5F0;
+      color: #35313C;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .safe-top { padding-top: env(safe-area-inset-top, 54px); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 38px); }
+  </style>
+</head>
+<body class="flex justify-center bg-[#eae7e1] min-h-screen">
+  <div class="w-full max-w-[393px] min-h-[852px] bg-[#F8F5F0] flex flex-col justify-between safe-top safe-bottom px-6 py-4 shadow-2xl relative overflow-hidden select-none">
+    
+    <!-- Top Bar with Step Indicators & Back Button -->
+    <div class="flex items-center justify-between pt-2">
+      <button class="w-9 h-9 rounded-full bg-white/70 border border-[#35313C]/5 flex items-center justify-center text-[#35313C] hover:bg-white transition-all shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <!-- Progress Pill Dots -->
+      <div class="flex items-center gap-1.5">
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/30"></div>
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/30"></div>
+        <div class="w-7 h-1.5 rounded-full bg-[#35313C] transition-all"></div>
+        <div class="w-2 h-1.5 rounded-full bg-[#35313C]/20"></div>
+      </div>
+
+      <span class="text-xs font-medium text-[#7A757F] px-1">Passo 3 de 4</span>
+    </div>
+
+    <!-- Title & Guidance -->
+    <div class="pt-4 pb-2">
+      <span class="text-[11px] font-semibold tracking-wider uppercase text-[#7A757F] bg-[#35313C]/5 px-2.5 py-0.5 rounded-full inline-block mb-1.5">
+        Ritmo Biológico & Trabalho
+      </span>
+      <h2 class="text-[26px] font-bold text-[#35313C] tracking-tight leading-snug">
+        Como são seus horários habituais?
+      </h2>
+      <p class="text-[13px] text-[#7A757F] pt-1">
+        O Dayli protege suas janelas de energia e evita agendar compromissos em momentos de descanso.
+      </p>
+    </div>
+
+    <!-- Routine Parameters -->
+    <div class="space-y-3.5 my-auto">
+
+      <!-- Block 1: Despertar & Manhã -->
+      <div class="bg-white rounded-2xl p-4 border border-[#35313C]/5 shadow-sm space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-[#F6F3EE] flex items-center justify-center text-base">
+              ☀️
+            </div>
+            <div>
+              <span class="text-[14px] font-bold text-[#35313C] block leading-tight">Despertar & Começo do Dia</span>
+              <span class="text-[11px] text-[#7A757F]">Ritual matinal e café sem pressa</span>
+            </div>
+          </div>
+          
+          <!-- Native Time Picker Pill -->
+          <div class="bg-[#F8F5F0] border border-[#35313C]/10 rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-xs font-bold text-[#35313C]">
+            <span>07:00</span>
+            <svg class="w-3.5 h-3.5 text-[#7A757F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 2: Expediente de Trabalho -->
+      <div class="bg-white rounded-2xl p-4 border border-[#35313C]/5 shadow-sm space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-[#E8EEF5] flex items-center justify-center text-base">
+              💼
+            </div>
+            <div>
+              <span class="text-[14px] font-bold text-[#35313C] block leading-tight">Expediente no Banco</span>
+              <span class="text-[11px] text-[#7A757F]">Segunda a Sexta</span>
+            </div>
+          </div>
+
+          <!-- Time Range Pill -->
+          <div class="bg-[#F8F5F0] border border-[#35313C]/10 rounded-xl px-3 py-1.5 flex items-center gap-1 text-xs font-bold text-[#35313C]">
+            <span>08:30 – 17:30</span>
+            <svg class="w-3 h-3 text-[#7A757F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Buffer Tag -->
+        <div class="flex items-center gap-1.5 text-[11px] text-[#406882] bg-[#E8EEF5]/60 px-3 py-1.5 rounded-xl">
+          <span>🛡️</span>
+          <span>Bloquear foco profundo durante reuniões de fechamento</span>
+        </div>
+      </div>
+
+      <!-- Block 3: Horário Noturno / Desaceleração -->
+      <div class="bg-white rounded-2xl p-4 border border-[#35313C]/5 shadow-sm space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-[#FAEDEF] flex items-center justify-center text-base">
+              🌙
+            </div>
+            <div>
+              <span class="text-[14px] font-bold text-[#35313C] block leading-tight">Desaceleração Noturna</span>
+              <span class="text-[11px] text-[#7A757F]">Silencia tarefas e notificações</span>
+            </div>
+          </div>
+
+          <!-- Time Pill -->
+          <div class="bg-[#F8F5F0] border border-[#35313C]/10 rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-xs font-bold text-[#35313C]">
+            <span>21:30</span>
+            <svg class="w-3.5 h-3.5 text-[#7A757F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Intelligent Assistant Safety Switch -->
+      <div class="bg-white/80 rounded-2xl p-3.5 border border-[#35313C]/5 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-[#B8A3CE]/20 flex items-center justify-center text-sm text-[#886FAD]">
+            ✨
+          </div>
+          <div>
+            <span class="text-[13px] font-semibold text-[#35313C] block">Micropausas automáticas</span>
+            <span class="text-[10px] text-[#7A757F]">Inserir 15 min de respiro entre reuniões</span>
+          </div>
+        </div>
+        
+        <!-- iOS Toggle Active -->
+        <div class="w-11 h-6 bg-[#35313C] rounded-full flex items-center justify-end px-0.5 shadow-inner">
+          <div class="w-5 h-5 bg-white rounded-full shadow-sm"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="pt-3 space-y-2">
+      <button class="w-full bg-[#35313C] hover:bg-[#25222b] text-white py-4 px-6 rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-[#35313C]/10 active:scale-[0.99] transition-all">
+        <span>Concluir e Começar</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+        </svg>
+      </button>
+
+      <p class="text-center text-[11px] text-[#7A757F]">
+        Você tem autonomia total para mudar estes horários no seu perfil.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+# Compila e testa o Dayli em um Mac do GitHub Actions (não é preciso ter Mac).
+# Resultados: aba "Actions" do repositório → execução → artefatos "build-log" e "test-results".
+name: iOS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core-tests:
+    name: DayliCore (regras de negócio)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versões
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+      - name: swift test
+        working-directory: Packages/DayliCore
+        run: swift test 2>&1 | tee ../../core-tests.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: core-tests-log
+          path: core-tests.log
+
+  app:
+    name: App (build + testes no simulador)
+    runs-on: macos-15
+    needs: core-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+      - name: Gerar projeto
+        run: xcodegen generate
+      - name: Simuladores disponíveis
+        run: xcrun simctl list devices available | head -40
+      - name: Build e testes
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project Dayli.xcodeproj \
+            -scheme Dayli \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-log
+          path: build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults.xcresult
+
+      # App para simulador: pode ser enviado ao Appetize.io para usar no navegador.
+      - name: Build para simulador (Appetize)
+        run: |
+          set -o pipefail
+          xcodebuild build -project Dayli.xcodeproj -scheme Dayli -configuration Debug \
+            -sdk iphonesimulator -derivedDataPath build-sim CODE_SIGNING_ALLOWED=NO | tail -20
+          cd build-sim/Build/Products/Debug-iphonesimulator
+          zip -qr "$GITHUB_WORKSPACE/Dayli-simulator.zip" Dayli.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dayli-simulator
+          path: Dayli-simulator.zip
+
+      # IPA sem assinatura: pode ser assinada e instalada com Apple ID gratuito (ex.: Sideloadly).
+      - name: Build para iPhone (IPA sem assinatura)
+        run: |
+          set -o pipefail
+          xcodebuild build -project Dayli.xcodeproj -scheme Dayli -configuration Release \
+            -sdk iphoneos -derivedDataPath build-device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" | tail -20
+          mkdir -p Payload
+          cp -R build-device/Build/Products/Release-iphoneos/Dayli.app Payload/
+          zip -qr Dayli-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dayli-unsigned-ipa
+          path: Dayli-unsigned.ipa
