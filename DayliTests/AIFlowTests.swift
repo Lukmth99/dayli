@@ -14,11 +14,13 @@ private struct StubAIService: AIService {
 
 @MainActor
 final class AIFlowTests: XCTestCase {
+    // O contêiner precisa ficar retido durante o teste: o ModelContext não o mantém vivo.
+    var container: ModelContainer!
     var repo: DayliRepository!
     var calendar: Calendar!
 
     override func setUp() async throws {
-        let container = try PersistenceController.makeContainer(inMemory: true)
+        container = try PersistenceController.makeContainer(inMemory: true)
         calendar = Calendar.dayli
         repo = DayliRepository(context: container.mainContext, calendar: calendar)
         repo.ensureDefaultCategories()

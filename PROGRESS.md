@@ -30,9 +30,9 @@ A usuária/dono do projeto não tem Mac. Caminho adotado: compilar e testar via 
 ### Registro de resultados
 | Data | Comando | Resultado |
 |---|---|---|
-| — | `swift test` (DayliCore) | ainda não executado |
-| — | `xcodebuild build` | ainda não executado |
-| — | `xcodebuild test` | ainda não executado |
+| 2026-11-07 | `swift test` (DayliCore, GitHub Actions macos-15) | ✅ 63 testes, 0 falhas |
+| 2026-11-07 | `xcodebuild build` | ✅ compilou (1 aviso de concorrência, corrigido) |
+| 2026-11-07 | `xcodebuild test` | ❌ AIFlowTests travava (ModelContainer local liberado no setUp → corrigido retendo o contêiner); UI tests ✅ 3/3; RepositoryTests não chegaram a rodar |
 
 ### Decisões tomadas nesta sessão
 - XcodeGen em vez de `.pbxproj` escrito à mão.

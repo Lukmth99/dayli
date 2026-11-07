@@ -77,7 +77,8 @@ final class AppEnvironment {
 
     private let syncDebouncer = Debouncer(delay: .milliseconds(600))
 
-    init(container: ModelContainer, router: AppRouter = .shared) {
+    init(container: ModelContainer, router: AppRouter? = nil) {
+        let router = router ?? AppRouter.shared
         self.container = container
         self.repository = DayliRepository(context: container.mainContext)
         self.calendarService = CalendarService()
