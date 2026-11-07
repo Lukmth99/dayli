@@ -97,7 +97,7 @@ final class NotificationCoordinator {
                 if settings.taskRemindersEnabled, let offset = task.reminderOffsetMinutes {
                     let base = task.hasTime ? due : TimeOfDay(hour: 9).date(on: due, calendar: calendar)
                     let fire = base.addingTimeInterval(TimeInterval(-offset * 60))
-                    if horizon.contains(fire) {
+                    if horizon.includes(fire) {
                         let body = task.hasTime ? "Às \(DayliFormat.time(due)). Sem pressa, no seu ritmo." : "Está na sua lista de hoje."
                         items.append(PlannedNotification(id: "task.\(task.id.uuidString)", kind: .task, title: task.title, body: body, fireDate: fire))
                     }
@@ -105,7 +105,7 @@ final class NotificationCoordinator {
                 if settings.deadlineAlertsEnabled, task.priority == .high, !task.hasTime {
                     // Aviso de prazo na véspera, às 18h, para tarefas prioritárias.
                     let eve = TimeOfDay(hour: 18).date(on: calendar.addingDays(-1, to: due), calendar: calendar)
-                    if horizon.contains(eve) {
+                    if horizon.includes(eve) {
                         items.append(PlannedNotification(id: "deadline.\(task.id.uuidString)", kind: .deadline, title: "Prazo amanhã",
                                                          body: "\(task.title) vence amanhã. Quer reservar um horário?", fireDate: eve))
                     }

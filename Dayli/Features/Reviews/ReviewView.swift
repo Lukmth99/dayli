@@ -40,16 +40,16 @@ struct ReviewView: View {
     var body: some View {
         let range = interval
         let now = Date.now
-        let completed = tasks.filter { $0.isCompleted && ($0.completedAt.map { range.contains($0) } ?? false) }
+        let completed = tasks.filter { $0.isCompleted && ($0.completedAt.map { range.includes($0) } ?? false) }
         let pending = tasks.filter { !$0.isCompleted && ($0.dueDate.map { $0 < min(range.end, calendar.endOfDay(for: now)) } ?? false) }
-        let rescheduled = tasks.filter { $0.rescheduleCount > 0 && range.contains($0.updatedAt) }
+        let rescheduled = tasks.filter { $0.rescheduleCount > 0 && range.includes($0.updatedAt) }
         let pastRange = DateInterval(start: range.start, end: max(range.start, min(range.end, now)))
         let eventsHappened = events.reduce(0) { total, event in
             total + event.occurrenceStarts(in: pastRange, calendar: calendar).filter { $0.addingTimeInterval(event.duration) <= now }.count
         }
         let externalHappened = env.calendarService.events(in: pastRange).filter { $0.end <= now }.count
         let habitEntries = habits.flatMap(\.entries).filter { entry in
-            range.contains(entry.day) && (entry.habit.map { entry.count >= $0.targetCount } ?? false)
+            range.includes(entry.day) && (entry.habit.map { entry.count >= $0.targetCount } ?? false)
         }
         let activeGoals = goals.filter { $0.status == .active }
 
@@ -122,7 +122,7 @@ struct ReviewView: View {
         let stats: [DayStat] = (0..<7).map { offset in
             let day = calendar.addingDays(offset, to: range.start)
             let dayRange = calendar.dayInterval(for: day)
-            let done = tasks.filter { $0.completedAt.map { dayRange.contains($0) } ?? false }.count
+            let done = tasks.filter { $0.completedAt.map { dayRange.includes($0) } ?? false }.count
             let habitDays = habits.filter { h in h.entries.contains { $0.day == day && $0.count >= h.targetCount } }.count
             return DayStat(day: day, completed: done, habitDays: habitDays)
         }

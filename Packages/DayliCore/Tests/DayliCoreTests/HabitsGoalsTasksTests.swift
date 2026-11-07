@@ -135,6 +135,13 @@ final class TaskRulesTests: XCTestCase {
         XCTAssertEqual(InputValidator.sanitizedTitle(String(repeating: "a", count: 500))?.count, InputValidator.maxTitleLength)
     }
 
+    func testDayIntervalExcludesNextMidnight() {
+        let day = cal.dayInterval(for: cal.date(2026, 11, 7, 10))
+        XCTAssertTrue(day.includes(cal.date(2026, 11, 7)))
+        XCTAssertTrue(day.includes(cal.date(2026, 11, 7, 23, 59)))
+        XCTAssertFalse(day.includes(cal.date(2026, 11, 8)))
+    }
+
     func testGreeting() {
         XCTAssertEqual(Greeting.salutation(for: cal.date(2026, 11, 7, 7), calendar: cal), "Bom dia")
         XCTAssertEqual(Greeting.salutation(for: cal.date(2026, 11, 7, 13), calendar: cal), "Boa tarde")

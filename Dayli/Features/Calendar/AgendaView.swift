@@ -181,7 +181,7 @@ struct AgendaView: View {
     private func hasItems(on day: Date) -> Bool {
         let interval = calendar.dayInterval(for: day)
         if events.contains(where: { !$0.occurrenceStarts(in: interval, calendar: calendar).isEmpty }) { return true }
-        return tasks.contains { !$0.isCompleted && $0.dueDate.map { interval.contains($0) } == true }
+        return tasks.contains { !$0.isCompleted && $0.dueDate.map { interval.includes($0) } == true }
     }
 
     private func category(_ id: UUID?) -> LifeCategory? {

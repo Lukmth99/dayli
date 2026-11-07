@@ -87,7 +87,7 @@ struct MyLifeView: View {
         let week = calendar.dateInterval(of: .weekOfYear, for: .now) ?? calendar.dayInterval(for: .now)
         let areaTasks = tasks.filter { $0.category?.area == area }
         let pending = areaTasks.filter { !$0.isCompleted }.count
-        let done = areaTasks.filter { $0.completedAt.map { week.contains($0) } == true }.count
+        let done = areaTasks.filter { $0.completedAt.map { week.includes($0) } == true }.count
         let next7 = DateInterval(start: .now, end: calendar.addingDays(7, to: .now))
         let upcoming = events.filter { $0.category?.area == area }.reduce(0) { $0 + $1.occurrenceStarts(in: next7, calendar: calendar).count }
         let areaGoals = goals.filter { $0.category?.area == area && $0.status == .active }.count

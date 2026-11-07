@@ -79,12 +79,12 @@ extension DayliRepository {
         let isToday = calendar.isDate(day, inSameDayAs: now())
         return allTasks().filter { task in
             if let completedAt = task.completedAt, task.isCompleted {
-                if interval.contains(completedAt) { return true }
-                if let due = task.dueDate, interval.contains(due) { return true }
+                if interval.includes(completedAt) { return true }
+                if let due = task.dueDate, interval.includes(due) { return true }
                 return false
             }
             guard let due = task.dueDate else { return false }
-            if interval.contains(due) { return true }
+            if interval.includes(due) { return true }
             return isToday && due < interval.start
         }
     }

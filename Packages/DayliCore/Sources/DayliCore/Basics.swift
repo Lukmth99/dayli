@@ -213,6 +213,12 @@ public enum Greeting {
 
 // MARK: - Datas
 
+public extension DateInterval {
+    /// Pertinência semiaberta [início, fim). `DateInterval.contains` inclui o fim,
+    /// o que faria um item à meia-noite de amanhã aparecer no dia de hoje.
+    func includes(_ date: Date) -> Bool { date >= start && date < end }
+}
+
 public extension Calendar {
     func endOfDay(for date: Date) -> Date {
         let start = startOfDay(for: date)
