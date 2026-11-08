@@ -45,6 +45,8 @@ final class AssistantViewModel {
     var messages: [AIMessage] { conversation.sortedMessages }
 
     var remoteAvailable: Bool { env.isRemoteAIConfigured && env.repository.settings().hasAIConsent }
+    /// Sem servidor configurado na compilação, a opção "Dayli AI" nem aparece.
+    var remoteConfigured: Bool { env.isRemoteAIConfigured }
 
     func send() async {
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -212,10 +214,12 @@ private struct AssistantContent: View {
 
     private var modeBar: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Picker("Modo", selection: $model.mode) {
-                ForEach(AssistantViewModel.Mode.allCases) { Text($0.title).tag($0) }
+            if model.remoteConfigured {
+                Picker("Modo", selection: $model.mode) {
+                    ForEach(AssistantViewModel.Mode.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.segmented)
             }
-            .pickerStyle(.segmented)
             Text(model.mode == .local
                  ? "Assistente local: regras no seu iPhone, sem IA generativa e sem enviar dados."
                  : (model.remoteAvailable
