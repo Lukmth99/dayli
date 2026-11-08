@@ -11,7 +11,7 @@
 //
 // Arquivo único, sem dependências: pode ser colado direto no editor da Cloudflare.
 
-const VERSION = "2026-11-08.5";
+const VERSION = "2026-11-08.6";
 const MAX_BODY = 64 * 1024;
 const MAX_ACTIONS = 20;
 const ACTION_TYPES = ["createTask", "createEvent", "rescheduleTask", "setTaskPriority"];
@@ -30,10 +30,13 @@ export default {
         const now = new Date();
         const ctx = { timeZone: "America/Sao_Paulo", now: now.toISOString(), userMessage: "Agende amanhã às 12:00 um almoço com meu pai",
           tasks: [], busy: [], routine: { wake: { hour: 7, minute: 0 }, sleep: { hour: 23, minute: 0 }, bufferMinutes: 10 } };
-        const out = sanitize(await callGemini(env, buildPrompt(ctx, ctx.timeZone)), ctx, ctx.timeZone);
-        return json({ gemini: "ok", version: VERSION, protected: Boolean(env.DAYLI_ACCESS_CODE), teste: out });
+        const attempts = [];
+        const t0 = Date.now();
+        const raw = await callGemini(env, buildPrompt(ctx, ctx.timeZone), attempts);
+        const out = sanitize(raw, ctx, ctx.timeZone);
+        return json({ gemini: "ok", version: VERSION, protected: Boolean(env.DAYLI_ACCESS_CODE), ms: Date.now() - t0, tentativas: attempts, bruto: raw, teste: out });
       } catch (e) {
-        return json({ gemini: "erro", status: e.status || null, motivo: e.reason || String(e && e.message) });
+        return json({ gemini: "erro", version: VERSION, status: e.status || null, motivo: e.reason || String(e && e.message), tentativas: e.attempts || [] });
       }
     }
     if (request.method !== "POST" || url.pathname !== "/v1/assistant/proposals") {
@@ -70,29 +73,44 @@ export default {
 
 // ---------- Gemini ----------
 
-async function callGemini(env, prompt) {
-  // Tenta o modelo configurado e, se ele não existir, estiver sobrecarregado ou sem cota
-  // (cada modelo tem cota grátis própria), passa para os alternativos.
-  const fallbacks = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
-  const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...fallbacks.filter((m) => m !== env.GEMINI_MODEL)] : fallbacks;
-  const retryable = new Set([404, 408, 429, 500, 503]);
+// Modelos em ordem de preferência. "Pensar" desligado onde é possível: deixa a resposta
+// em poucos segundos, suficiente para propor horários.
+const MODELS = [
+  { name: "gemini-2.5-flash", thinking: { thinkingBudget: 0 } },
+  { name: "gemini-2.5-flash-lite", thinking: { thinkingBudget: 0 } },
+  { name: "gemini-flash-latest" },
+  { name: "gemini-flash-lite-latest" },
+  { name: "gemini-2.0-flash" },
+];
+
+async function callGemini(env, prompt, attempts = []) {
+  // Se um modelo não existir, estiver sobrecarregado, lento ou sem cota
+  // (cada modelo tem cota grátis própria), passa para o próximo.
+  const models = env.GEMINI_MODEL ? [{ name: env.GEMINI_MODEL }, ...MODELS.filter((m) => m.name !== env.GEMINI_MODEL)] : MODELS;
+  const retryable = new Set([400, 404, 408, 429, 500, 503]);
   // O app desiste em 30 s: o servidor encerra antes, em ~25 s no total.
   const deadline = Date.now() + 25000;
   let lastError;
   for (const model of models) {
     const remaining = deadline - Date.now();
     if (remaining < 3000) break;
+    const t = Date.now();
     try {
-      return await callGeminiModel(env, model, prompt, Math.min(remaining, 15000));
+      const out = await callGeminiModel(env, model, prompt, Math.min(remaining, 12000));
+      attempts.push({ modelo: model.name, ok: true, ms: Date.now() - t });
+      return out;
     } catch (e) {
+      attempts.push({ modelo: model.name, status: e.status || null, ms: Date.now() - t });
       lastError = e;
-      if (!retryable.has(e.status)) throw e;
+      if (!retryable.has(e.status)) break;
     }
   }
-  throw lastError || Object.assign(new Error("timeout"), { status: 408, reason: "Tempo esgotado" });
+  const err = lastError || Object.assign(new Error("timeout"), { status: 408, reason: "Tempo esgotado" });
+  err.attempts = attempts;
+  throw err;
 }
 
-async function callGeminiModel(env, model, { system, user }, timeoutMs) {
+async function callGeminiModel(env, { name: model, thinking }, { system, user }, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   let res;
@@ -107,6 +125,7 @@ async function callGeminiModel(env, model, { system, user }, timeoutMs) {
         temperature: 0.3,
         responseMimeType: "application/json",
         responseSchema: RESPONSE_SCHEMA,
+        ...(thinking ? { thinkingConfig: thinking } : {}),
       },
     }),
     signal: controller.signal,
@@ -125,8 +144,12 @@ async function callGeminiModel(env, model, { system, user }, timeoutMs) {
     throw err;
   }
   const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
-  return JSON.parse(text);
+  const text = data?.candidates?.[0]?.content?.parts?.filter((p) => !p.thought).map((p) => p.text || "").join("") || "";
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw Object.assign(new Error("json"), { status: 500, reason: `${model}: resposta fora do formato` });
+  }
 }
 
 const RESPONSE_SCHEMA = {
@@ -207,7 +230,7 @@ function sanitize(out, ctx, tz) {
     const r = { type: a.type };
     if (typeof a.taskID === "string" && known.has(a.taskID.toUpperCase())) r.taskID = a.taskID.toUpperCase();
     if (typeof a.title === "string" && a.title.trim()) r.title = a.title.trim().slice(0, 200);
-    const start = typeof a.start === "string" ? localToUTC(a.start, tz) : null;
+    const start = typeof a.start === "string" ? localToUTC(a.start, tz, ctx.now) : null;
     if (start) r.start = isoNoMillis(start);
     if (Number.isFinite(a.durationMinutes)) r.durationMinutes = Math.round(a.durationMinutes);
     if ([0, 1, 2].includes(a.priority)) r.priority = a.priority;
@@ -266,14 +289,22 @@ function weekday(date, tz) {
   return new Intl.DateTimeFormat("pt-BR", { timeZone: tz, weekday: "long" }).format(date);
 }
 
-function localToUTC(str, tz) {
+function localToUTC(str, tz, nowISO) {
   // Aceita horário local "YYYY-MM-DDTHH:MM"; se vier com Z/offset, respeita.
   if (/[zZ]$|[+-]\d{2}:?\d{2}$/.test(str)) {
     const d = new Date(str);
     return isNaN(d.getTime()) ? null : d;
   }
-  const m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(str);
-  if (!m) return null;
+  let m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{1,2}):(\d{2})/.exec(str.trim());
+  if (!m) {
+    // Só "HH:MM": hoje, se ainda não passou; senão amanhã.
+    const hm = /^(\d{1,2})[:h](\d{2})$/.exec(str.trim());
+    if (!hm || !nowISO) return null;
+    const today = toLocal(new Date(nowISO), tz).slice(0, 10);
+    let cand = localToUTC(`${today}T${hm[1].padStart(2, "0")}:${hm[2]}`, tz);
+    if (cand && cand < new Date(nowISO)) cand = new Date(cand.getTime() + 86400000);
+    return cand;
+  }
   const guess = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
   let t = guess - offsetMs(new Date(guess), tz);
   t = guess - offsetMs(new Date(t), tz);
