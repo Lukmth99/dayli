@@ -7,7 +7,7 @@
 //   GEMINI_API_KEY      (Secret, obrigatória) chave do Google AI Studio
 //   DAYLI_ACCESS_CODE   (Secret, recomendada) código que o app envia como "Bearer";
 //                       sem ele, qualquer pessoa com o endereço consome sua cota grátis
-//   GEMINI_MODEL        (Text, opcional) padrão: gemini-2.5-flash
+//   GEMINI_MODEL        (Text, opcional) padrão: gemini-flash-latest (com alternativas)
 //
 // Arquivo único, sem dependências: pode ser colado direto no editor da Cloudflare.
 
@@ -19,7 +19,17 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/") {
-      return json({ ok: true, service: "Dayli AI", configured: Boolean(env.GEMINI_API_KEY) });
+      return json({ ok: true, service: "Dayli AI", configured: Boolean(env.GEMINI_API_KEY), protected: Boolean(env.DAYLI_ACCESS_CODE) });
+    }
+    if (request.method === "GET" && url.pathname === "/check") {
+      // Diagnóstico: faz uma chamada mínima ao Gemini (sem dados de ninguém).
+      if (!env.GEMINI_API_KEY) return json({ gemini: "sem_chave" });
+      try {
+        await callGemini(env, { system: "Responda com message 'ok' e actions vazio.", user: "teste" });
+        return json({ gemini: "ok", protected: Boolean(env.DAYLI_ACCESS_CODE) });
+      } catch (e) {
+        return json({ gemini: "erro", status: e.status || null, motivo: e.reason || String(e && e.message) });
+      }
     }
     if (request.method !== "POST" || url.pathname !== "/v1/assistant/proposals") {
       return json({ error: "not_found" }, 404);
@@ -46,7 +56,7 @@ export default {
       return json(sanitize(modelOut, context, tz));
     } catch (e) {
       // Sem conteúdo da usuária nos logs.
-      console.log("gemini_error", String(e && e.status ? e.status : e && e.name));
+      console.log("gemini_error", String(e && e.status ? e.status : e && e.name), e && e.reason ? e.reason : "");
       const status = e && e.status === 429 ? 429 : 502;
       return json({ error: "upstream" }, status);
     }
@@ -55,8 +65,22 @@ export default {
 
 // ---------- Gemini ----------
 
-async function callGemini(env, { system, user }) {
-  const model = env.GEMINI_MODEL || "gemini-2.5-flash";
+async function callGemini(env, prompt) {
+  // Tenta o modelo configurado; se o nome não existir mais (404), usa os alternativos.
+  const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL] : ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash"];
+  let lastError;
+  for (const model of models) {
+    try {
+      return await callGeminiModel(env, model, prompt);
+    } catch (e) {
+      lastError = e;
+      if (e.status !== 404) throw e;
+    }
+  }
+  throw lastError;
+}
+
+async function callGeminiModel(env, model, { system, user }) {
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
@@ -73,6 +97,9 @@ async function callGemini(env, { system, user }) {
   if (!res.ok) {
     const err = new Error("gemini");
     err.status = res.status;
+    try {
+      err.reason = String((await res.json())?.error?.message || "").slice(0, 300);
+    } catch {}
     throw err;
   }
   const data = await res.json();
