@@ -66,15 +66,18 @@ export default {
 // ---------- Gemini ----------
 
 async function callGemini(env, prompt) {
-  // Tenta o modelo configurado; se o nome não existir mais (404), usa os alternativos.
-  const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL] : ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.0-flash"];
+  // Tenta o modelo configurado e, se ele não existir, estiver sobrecarregado ou sem cota
+  // (cada modelo tem cota grátis própria), passa para os alternativos.
+  const fallbacks = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
+  const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...fallbacks.filter((m) => m !== env.GEMINI_MODEL)] : fallbacks;
+  const retryable = new Set([404, 429, 500, 503]);
   let lastError;
   for (const model of models) {
     try {
       return await callGeminiModel(env, model, prompt);
     } catch (e) {
       lastError = e;
-      if (e.status !== 404) throw e;
+      if (!retryable.has(e.status)) throw e;
     }
   }
   throw lastError;
