@@ -70,21 +70,29 @@ async function callGemini(env, prompt) {
   // (cada modelo tem cota grátis própria), passa para os alternativos.
   const fallbacks = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
   const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...fallbacks.filter((m) => m !== env.GEMINI_MODEL)] : fallbacks;
-  const retryable = new Set([404, 429, 500, 503]);
+  const retryable = new Set([404, 408, 429, 500, 503]);
+  // O app desiste em 30 s: o servidor encerra antes, em ~25 s no total.
+  const deadline = Date.now() + 25000;
   let lastError;
   for (const model of models) {
+    const remaining = deadline - Date.now();
+    if (remaining < 3000) break;
     try {
-      return await callGeminiModel(env, model, prompt);
+      return await callGeminiModel(env, model, prompt, Math.min(remaining, 15000));
     } catch (e) {
       lastError = e;
       if (!retryable.has(e.status)) throw e;
     }
   }
-  throw lastError;
+  throw lastError || Object.assign(new Error("timeout"), { status: 408, reason: "Tempo esgotado" });
 }
 
-async function callGeminiModel(env, model, { system, user }) {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+async function callGeminiModel(env, model, { system, user }, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let res;
+  try {
+    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
     body: JSON.stringify({
@@ -96,12 +104,18 @@ async function callGeminiModel(env, model, { system, user }) {
         responseSchema: RESPONSE_SCHEMA,
       },
     }),
+    signal: controller.signal,
   });
+  } catch (e) {
+    throw Object.assign(new Error("timeout"), { status: 408, reason: `${model}: sem resposta a tempo` });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!res.ok) {
     const err = new Error("gemini");
     err.status = res.status;
     try {
-      err.reason = String((await res.json())?.error?.message || "").slice(0, 300);
+      err.reason = `${model}: ` + String((await res.json())?.error?.message || "").slice(0, 300);
     } catch {}
     throw err;
   }
