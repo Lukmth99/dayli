@@ -11,7 +11,7 @@
 //
 // Arquivo único, sem dependências: pode ser colado direto no editor da Cloudflare.
 
-const VERSION = "2026-11-08.6";
+const VERSION = "2026-11-08.7";
 const MAX_BODY = 64 * 1024;
 const MAX_ACTIONS = 20;
 const ACTION_TYPES = ["createTask", "createEvent", "rescheduleTask", "setTaskPriority"];
@@ -36,7 +36,7 @@ export default {
         const out = sanitize(raw, ctx, ctx.timeZone);
         return json({ gemini: "ok", version: VERSION, protected: Boolean(env.DAYLI_ACCESS_CODE), ms: Date.now() - t0, tentativas: attempts, bruto: raw, teste: out });
       } catch (e) {
-        return json({ gemini: "erro", version: VERSION, status: e.status || null, motivo: e.reason || String(e && e.message), tentativas: e.attempts || [] });
+        return json({ gemini: "erro", version: VERSION, status: e.status || null, motivo: e.reason || String(e && e.message), tentativas: e.attempts || [], modelosDisponiveis: await listFlashModels(env) });
       }
     }
     if (request.method !== "POST" || url.pathname !== "/v1/assistant/proposals") {
@@ -73,14 +73,26 @@ export default {
 
 // ---------- Gemini ----------
 
+async function listFlashModels(env) {
+  try {
+    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", { headers: { "x-goog-api-key": env.GEMINI_API_KEY } });
+    const data = await res.json();
+    return (data.models || []).map((m) => m.name.replace("models/", "")).filter((n) => n.includes("flash"));
+  } catch {
+    return null;
+  }
+}
+
 // Modelos em ordem de preferência. "Pensar" desligado onde é possível: deixa a resposta
 // em poucos segundos, suficiente para propor horários.
+// Para cada modelo, tenta primeiro o "pensar" mínimo; se o modelo não aceitar o parâmetro (400),
+// tenta a próxima forma.
+const THINKING_VARIANTS = [{ thinkingLevel: "minimal" }, { thinkingLevel: "low" }, { thinkingBudget: 0 }, null];
 const MODELS = [
-  { name: "gemini-2.5-flash", thinking: { thinkingBudget: 0 } },
-  { name: "gemini-2.5-flash-lite", thinking: { thinkingBudget: 0 } },
-  { name: "gemini-flash-latest" },
   { name: "gemini-flash-lite-latest" },
-  { name: "gemini-2.0-flash" },
+  { name: "gemini-flash-latest" },
+  { name: "gemini-2.5-flash-lite" },
+  { name: "gemini-2.5-flash" },
 ];
 
 async function callGemini(env, prompt, attempts = []) {
@@ -94,16 +106,24 @@ async function callGemini(env, prompt, attempts = []) {
   for (const model of models) {
     const remaining = deadline - Date.now();
     if (remaining < 3000) break;
-    const t = Date.now();
-    try {
-      const out = await callGeminiModel(env, model, prompt, Math.min(remaining, 12000));
-      attempts.push({ modelo: model.name, ok: true, ms: Date.now() - t });
-      return out;
-    } catch (e) {
-      attempts.push({ modelo: model.name, status: e.status || null, ms: Date.now() - t });
-      lastError = e;
-      if (!retryable.has(e.status)) break;
+    let next = false;
+    for (const thinking of THINKING_VARIANTS) {
+      const left = deadline - Date.now();
+      if (left < 3000) break;
+      const t = Date.now();
+      try {
+        const out = await callGeminiModel(env, { name: model.name, thinking }, prompt, Math.min(left, 15000));
+        attempts.push({ modelo: model.name, pensar: thinking, ok: true, ms: Date.now() - t });
+        return out;
+      } catch (e) {
+        attempts.push({ modelo: model.name, pensar: thinking, status: e.status || null, ms: Date.now() - t, motivo: e.reason });
+        lastError = e;
+        if (e.status === 400) continue; // parâmetro de "pensar" não aceito: tenta outra forma
+        next = retryable.has(e.status);
+        break;
+      }
     }
+    if (!next && lastError && !retryable.has(lastError.status)) break;
   }
   const err = lastError || Object.assign(new Error("timeout"), { status: 408, reason: "Tempo esgotado" });
   err.attempts = attempts;
