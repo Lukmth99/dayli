@@ -40,6 +40,8 @@ final class AssistantViewModel {
             context.saveLogged()
             conversation = new
         }
+        // Com servidor configurado e consentimento dado, a Dayli AI é o modo padrão.
+        if remoteAvailable { mode = .remote }
     }
 
     var messages: [AIMessage] { conversation.sortedMessages }
