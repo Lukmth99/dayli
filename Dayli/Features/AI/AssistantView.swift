@@ -91,7 +91,14 @@ final class AssistantViewModel {
             let json = (try? AIResponseParser.makeEncoder().encode(proposal)) ?? Data()
             let record = AIProposalRecord(proposalJSON: json)
             env.repository.context.insert(record)
-            let message = append(role: "assistant", text: validation.message)
+            var reply = validation.message
+            if !validation.rejected.isEmpty {
+                let reasons = validation.rejected.map { r in "• \(r.action.title ?? "Sugestão"): \(r.reason.message)" }
+                reply += "\n\nDescartei por segurança:\n" + reasons.joined(separator: "\n")
+            } else if proposal.actions.isEmpty, Self.soundsLikeSchedulingRequest(text) {
+                reply += "\n\nNão recebi nenhuma ação para confirmar. Tente pedir de novo com dia e horário, por exemplo: \"almoço com meu pai hoje às 12h\"."
+            }
+            let message = append(role: "assistant", text: reply)
             if validation.valid.isEmpty {
                 record.status = validation.rejected.isEmpty ? .applied : .rejected
                 record.resultSummary = validation.rejected.isEmpty ? "Somente resposta" : "Ações inválidas descartadas"
@@ -134,6 +141,12 @@ final class AssistantViewModel {
         context.saveLogged()
         conversation = new
         pending = nil
+    }
+
+    /// Heurística simples para avisar quando um pedido de agendamento voltou sem ações.
+    static func soundsLikeSchedulingRequest(_ text: String) -> Bool {
+        let t = text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "pt_BR"))
+        return ["agend", "marc", "coloc", "cri", "lembr", "organiz", "reserv", "adicion"].contains { t.contains($0) }
     }
 
     @discardableResult

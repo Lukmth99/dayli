@@ -170,10 +170,13 @@ function buildPrompt(ctx, tz) {
     "- createEvent: title, start e durationMinutes obrigatórios.",
     "- rescheduleTask: taskID (copiado exatamente de tarefasPendentes), start e durationMinutes obrigatórios.",
     "- setTaskPriority: taskID e priority obrigatórios.",
+    "REGRA PRINCIPAL: tudo o que você disser que vai agendar, criar ou mover PRECISA estar em actions. Nunca diga que agendou ou propôs algo sem incluir a ação correspondente.",
+    "Compromissos com pessoas, refeições, consultas e reuniões são createEvent (duração padrão 60 min se a pessoa não disser). Afazeres são createTask.",
+    "Se a pessoa pedir um horário específico, use EXATAMENTE esse horário, mesmo que conflite com algo; nesse caso, avise do conflito em message (o app também mostra o aviso).",
     "Regras de horário:",
     "- Todos os horários estão no fuso local da pessoa. Use start no formato YYYY-MM-DDTHH:MM (local).",
     "- Nunca proponha horários no passado nem além de 30 dias.",
-    "- Não sobreponha períodos em 'ocupado' nem outras ações propostas; deixe o intervalo da rotina (bufferMinutes) entre blocos.",
+    "- Ao escolher horários por conta própria, não sobreponha períodos em 'ocupado' nem outras ações propostas; deixe o intervalo da rotina (bufferMinutes) entre blocos.",
     "- Respeite acordar/dormir e o expediente da rotina (wake, sleep, workStart, workEnd, workdays: 1=domingo … 7=sábado).",
     "- durationMinutes entre 5 e 720.",
     "- No máximo 10 ações. Se o pedido for só uma pergunta, responda em message e deixe actions vazio.",
@@ -205,6 +208,13 @@ function sanitize(out, ctx, tz) {
     if ([0, 1, 2].includes(a.priority)) r.priority = a.priority;
     if (typeof a.categoryName === "string" && a.categoryName.trim()) r.categoryName = a.categoryName.trim().slice(0, 60);
     if (typeof a.rationale === "string" && a.rationale.trim()) r.rationale = a.rationale.trim().slice(0, 300);
+
+    // Duração padrão quando o modelo esquece.
+    if (r.start && !r.durationMinutes) {
+      const task = (ctx.tasks || []).find((t) => String(t.id).toUpperCase() === r.taskID);
+      r.durationMinutes = task?.durationMinutes || 60;
+    }
+    if (r.durationMinutes) r.durationMinutes = Math.min(720, Math.max(5, r.durationMinutes));
 
     const ok =
       (r.type === "createTask" && r.title) ||
