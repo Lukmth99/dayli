@@ -11,7 +11,7 @@
 //
 // Arquivo único, sem dependências: pode ser colado direto no editor da Cloudflare.
 
-const VERSION = "2026-11-08.8";
+const VERSION = "2026-11-08.9";
 const MAX_BODY = 64 * 1024;
 const MAX_ACTIONS = 20;
 const ACTION_TYPES = ["createTask", "createEvent", "rescheduleTask", "setTaskPriority"];
@@ -88,51 +88,61 @@ async function listFlashModels(env) {
 // Para cada modelo, tenta primeiro o "pensar" mínimo; se o modelo não aceitar o parâmetro (400),
 // tenta a próxima forma.
 const THINKING_VARIANTS = [{ thinkingLevel: "minimal" }, { thinkingLevel: "low" }, { thinkingBudget: 0 }, null];
-const MODELS = [
-  { name: "gemini-flash-latest" },
-  { name: "gemini-flash-lite-latest" },
-  { name: "gemini-2.5-flash-lite" },
-  { name: "gemini-2.5-flash" },
-];
+// Vários modelos são consultados AO MESMO TEMPO; vale a primeira resposta boa.
+// (Na camada grátis a latência de cada modelo varia muito; cada um tem cota própria.)
+const MODELS = ["gemini-flash-latest", "gemini-flash-lite-latest", "gemini-3.1-flash-lite"];
+const DEADLINE_MS = 25000; // o app desiste em 30 s
 
 async function callGemini(env, prompt, attempts = []) {
-  // Se um modelo não existir, estiver sobrecarregado, lento ou sem cota
-  // (cada modelo tem cota grátis própria), passa para o próximo.
-  const models = env.GEMINI_MODEL ? [{ name: env.GEMINI_MODEL }, ...MODELS.filter((m) => m.name !== env.GEMINI_MODEL)] : MODELS;
-  const retryable = new Set([400, 404, 408, 429, 500, 503]);
-  // O app desiste em 30 s: o servidor encerra antes, em ~25 s no total.
-  const deadline = Date.now() + 25000;
-  let lastError;
-  for (const model of models) {
-    const remaining = deadline - Date.now();
-    if (remaining < 3000) break;
-    let next = false;
+  const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...MODELS.filter((m) => m !== env.GEMINI_MODEL)] : MODELS;
+  const deadline = Date.now() + DEADLINE_MS;
+  const stop = new AbortController();
+
+  async function tryModel(name) {
+    let lastError;
     for (const thinking of THINKING_VARIANTS) {
       const left = deadline - Date.now();
-      if (left < 3000) break;
+      if (left < 1000 || stop.signal.aborted) break;
       const t = Date.now();
       try {
-        const out = await callGeminiModel(env, { name: model.name, thinking }, prompt, Math.min(left, 15000));
-        attempts.push({ modelo: model.name, pensar: thinking, ok: true, ms: Date.now() - t });
+        const out = await callGeminiModel(env, { name, thinking }, prompt, left, stop.signal);
+        if (looksDegenerate(out, prompt)) throw Object.assign(new Error("degenerate"), { status: 422, reason: `${name}: resposta sem sentido` });
+        attempts.push({ modelo: name, pensar: thinking, ok: true, ms: Date.now() - t });
         return out;
       } catch (e) {
-        attempts.push({ modelo: model.name, pensar: thinking, status: e.status || null, ms: Date.now() - t, motivo: e.reason });
+        attempts.push({ modelo: name, pensar: thinking, status: e.status || null, ms: Date.now() - t, motivo: e.reason });
         lastError = e;
-        if (e.status === 400) continue; // parâmetro de "pensar" não aceito: tenta outra forma
-        next = retryable.has(e.status);
+        if (e.status === 400 && /thinking/i.test(e.reason || "")) continue; // parâmetro de "pensar" não aceito
         break;
       }
     }
-    if (!next && lastError && !retryable.has(lastError.status)) break;
+    throw lastError || Object.assign(new Error("timeout"), { status: 408, reason: `${name}: sem resposta a tempo` });
   }
-  const err = lastError || Object.assign(new Error("timeout"), { status: 408, reason: "Tempo esgotado" });
-  err.attempts = attempts;
-  throw err;
+
+  try {
+    const out = await Promise.any(models.map(tryModel));
+    stop.abort(); // cancela os que ainda estão rodando
+    return out;
+  } catch (agg) {
+    const errors = agg.errors || [agg];
+    const err = errors.find((e) => e.status === 429) || errors.find((e) => e.status !== 408) || errors[0];
+    err.attempts = attempts;
+    throw err;
+  }
 }
 
-async function callGeminiModel(env, { name: model, thinking }, { system, user }, timeoutMs) {
+function looksDegenerate(out, prompt) {
+  const foreign = /[Ѐ-ӿ֐-ۿ฀-๿぀-ヿ㐀-鿿가-힯]/;
+  if (foreign.test(prompt.user)) return false;
+  const texts = [out?.message, ...(Array.isArray(out?.actions) ? out.actions.map((a) => a?.title) : [])];
+  return texts.some((t) => typeof t === "string" && (foreign.test(t) || t.length > 4000));
+}
+
+async function callGeminiModel(env, { name: model, thinking }, { system, user }, timeoutMs, stopSignal) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const onStop = () => controller.abort();
+  stopSignal?.addEventListener("abort", onStop);
   let res;
   try {
     res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
@@ -154,6 +164,7 @@ async function callGeminiModel(env, { name: model, thinking }, { system, user },
     throw Object.assign(new Error("timeout"), { status: 408, reason: `${model}: sem resposta a tempo` });
   } finally {
     clearTimeout(timer);
+    stopSignal?.removeEventListener("abort", onStop);
   }
   if (!res.ok) {
     const err = new Error("gemini");
