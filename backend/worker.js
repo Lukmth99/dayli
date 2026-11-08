@@ -11,6 +11,7 @@
 //
 // Arquivo único, sem dependências: pode ser colado direto no editor da Cloudflare.
 
+const VERSION = "2026-11-08.5";
 const MAX_BODY = 64 * 1024;
 const MAX_ACTIONS = 20;
 const ACTION_TYPES = ["createTask", "createEvent", "rescheduleTask", "setTaskPriority"];
@@ -19,14 +20,18 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/") {
-      return json({ ok: true, service: "Dayli AI", configured: Boolean(env.GEMINI_API_KEY), protected: Boolean(env.DAYLI_ACCESS_CODE) });
+      return json({ ok: true, service: "Dayli AI", version: VERSION, configured: Boolean(env.GEMINI_API_KEY), protected: Boolean(env.DAYLI_ACCESS_CODE) });
     }
     if (request.method === "GET" && url.pathname === "/check") {
       // Diagnóstico: faz uma chamada mínima ao Gemini (sem dados de ninguém).
       if (!env.GEMINI_API_KEY) return json({ gemini: "sem_chave" });
       try {
-        await callGemini(env, { system: "Responda com message 'ok' e actions vazio.", user: "teste" });
-        return json({ gemini: "ok", protected: Boolean(env.DAYLI_ACCESS_CODE) });
+        // Cenário fictício (sem dados reais): pedido de agendamento com horário explícito.
+        const now = new Date();
+        const ctx = { timeZone: "America/Sao_Paulo", now: now.toISOString(), userMessage: "Agende amanhã às 12:00 um almoço com meu pai",
+          tasks: [], busy: [], routine: { wake: { hour: 7, minute: 0 }, sleep: { hour: 23, minute: 0 }, bufferMinutes: 10 } };
+        const out = sanitize(await callGemini(env, buildPrompt(ctx, ctx.timeZone)), ctx, ctx.timeZone);
+        return json({ gemini: "ok", version: VERSION, protected: Boolean(env.DAYLI_ACCESS_CODE), teste: out });
       } catch (e) {
         return json({ gemini: "erro", status: e.status || null, motivo: e.reason || String(e && e.message) });
       }
