@@ -197,7 +197,7 @@ function offsetMs(date, tz) {
 }
 
 function toLocal(date, tz) {
-  if (isNaN(date)) return null;
+  if (isNaN(date.getTime())) return null;
   const p = parts(date, tz);
   const z = (n) => String(n).padStart(2, "0");
   return `${p.y}-${z(p.mo)}-${z(p.d)}T${z(p.h)}:${z(p.mi)}`;
@@ -211,7 +211,7 @@ function localToUTC(str, tz) {
   // Aceita horário local "YYYY-MM-DDTHH:MM"; se vier com Z/offset, respeita.
   if (/[zZ]$|[+-]\d{2}:?\d{2}$/.test(str)) {
     const d = new Date(str);
-    return isNaN(d) ? null : d;
+    return isNaN(d.getTime()) ? null : d;
   }
   const m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(str);
   if (!m) return null;
