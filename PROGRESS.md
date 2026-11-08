@@ -36,6 +36,13 @@ A usuária/dono do projeto não tem Mac. Caminho adotado: compilar e testar via 
 | 2026-11-07 (run 2) | `xcodebuild test` | ❌ 1 falha real: item de amanhã 00:00 aparecia hoje (`DateInterval.contains` inclui o fim) → corrigido com `includes` semiaberto |
 | 2026-11-07 (run 3) | CI completo | ✅ BUILD + TEST SUCCEEDED: 64 testes DayliCore, 22 integração, 3 UI (89, 0 falhas); artefatos simulador (.app zip) e IPA sem assinatura gerados |
 
+## Sessão 2 — 2026-11-08
+- App instalado no iPhone (iOS 26.3.1) via iloader + SideStore (Apple ID gratuito; renovar a cada 7 dias).
+- Ícone do app (D com sol nascendo) em `AppIcon.appiconset`.
+- Assistente: seletor "Dayli AI" oculto enquanto não há servidor configurado.
+- Servidor gratuito da IA: `backend/worker.js` (Cloudflare Workers + Gemini), testado localmente com Node (mock do Gemini). Campo "Código de acesso" em Perfil › IA (Keychain).
+- Pendente: usuária criar contas Cloudflare + Google AI Studio e implantar (ver backend/README.md).
+
 ### Decisões tomadas nesta sessão
 - XcodeGen em vez de `.pbxproj` escrito à mão.
 - iOS 17+ (SwiftData, EventKit full access, widgets com `containerBackground`).

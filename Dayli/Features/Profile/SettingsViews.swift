@@ -224,6 +224,8 @@ struct AISettingsView: View {
     @State private var urlText = ""
     @State private var urlError: String?
     @State private var confirmConsent = false
+    @State private var accessCode = ""
+    @State private var hasAccessCode = false
 
     var body: some View {
         Form {
@@ -244,6 +246,24 @@ struct AISettingsView: View {
                     Text("Servidor da Dayli AI")
                 } footer: {
                     Text("O app nunca guarda chaves de provedores de IA. O servidor do Dayli autentica o aparelho e protege as credenciais. Deixe em branco para manter a IA remota desativada.")
+                }
+
+                Section {
+                    SecureField(hasAccessCode ? "Código salvo (digite para trocar)" : "Código de acesso", text: $accessCode)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    Button("Salvar código") { saveAccessCode() }
+                        .disabled(accessCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    if hasAccessCode {
+                        Button("Remover código", role: .destructive) {
+                            KeychainStore().remove(KeychainAccount.aiSessionToken)
+                            hasAccessCode = false
+                        }
+                    }
+                } header: {
+                    Text("Código de acesso do servidor")
+                } footer: {
+                    Text("O mesmo código configurado no seu servidor. Fica guardado no Keychain do iPhone.")
                 }
 
                 Section {
@@ -274,7 +294,10 @@ struct AISettingsView: View {
         .scrollContentBackground(.hidden)
         .dayliScreenBackground()
         .navigationTitle("Inteligência artificial")
-        .onAppear { urlText = settingsList.first?.aiBackendURL ?? "" }
+        .onAppear {
+            urlText = settingsList.first?.aiBackendURL ?? ""
+            hasAccessCode = KeychainStore().get(KeychainAccount.aiSessionToken) != nil
+        }
         .alert("Autorizar envio à Dayli AI?", isPresented: $confirmConsent) {
             Button("Autorizar") {
                 if let settings = settingsList.first {
@@ -305,6 +328,18 @@ struct AISettingsView: View {
         urlError = nil
         settings.aiBackendURL = url.absoluteString
         env.repository.commit()
+    }
+
+    private func saveAccessCode() {
+        let code = accessCode.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !code.isEmpty else { return }
+        do {
+            try KeychainStore().set(code, for: KeychainAccount.aiSessionToken)
+            hasAccessCode = true
+            accessCode = ""
+        } catch {
+            AppLog.ai.error("Falha ao salvar código de acesso no Keychain")
+        }
     }
 }
 
