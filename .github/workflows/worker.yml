@@ -1,0 +1,27 @@
+name: Servidor Dayli AI (Cloudflare)
+
+on:
+  push:
+    branches: [main]
+    paths: ["backend/**", ".github/workflows/worker.yml"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar sintaxe
+        run: cp backend/worker.js "$RUNNER_TEMP/w.mjs" && node --check "$RUNNER_TEMP/w.mjs"
+      - name: Implantar na Cloudflare
+        if: ${{ env.CF_TOKEN != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 646b4dfeb07eb4972d2fc427d9c6e6b7
+          workingDirectory: backend
+      - name: Testar
+        if: ${{ env.CF_TOKEN != '' }}
+        run: sleep 5 && curl -s -m 40 https://dayli-ai.lukmth.workers.dev/check

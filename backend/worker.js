@@ -11,7 +11,7 @@
 //
 // Arquivo único, sem dependências: pode ser colado direto no editor da Cloudflare.
 
-const VERSION = "2026-11-08.7";
+const VERSION = "2026-11-08.8";
 const MAX_BODY = 64 * 1024;
 const MAX_ACTIONS = 20;
 const ACTION_TYPES = ["createTask", "createEvent", "rescheduleTask", "setTaskPriority"];
@@ -89,8 +89,8 @@ async function listFlashModels(env) {
 // tenta a próxima forma.
 const THINKING_VARIANTS = [{ thinkingLevel: "minimal" }, { thinkingLevel: "low" }, { thinkingBudget: 0 }, null];
 const MODELS = [
-  { name: "gemini-flash-lite-latest" },
   { name: "gemini-flash-latest" },
+  { name: "gemini-flash-lite-latest" },
   { name: "gemini-2.5-flash-lite" },
   { name: "gemini-2.5-flash" },
 ];
@@ -249,7 +249,13 @@ function sanitize(out, ctx, tz) {
     if (!a || !ACTION_TYPES.includes(a.type)) continue;
     const r = { type: a.type };
     if (typeof a.taskID === "string" && known.has(a.taskID.toUpperCase())) r.taskID = a.taskID.toUpperCase();
-    if (typeof a.title === "string" && a.title.trim()) r.title = a.title.trim().slice(0, 200);
+    if (typeof a.title === "string" && a.title.trim()) {
+      const title = a.title.trim();
+      // Descarta títulos degenerados (texto enorme ou em outro alfabeto que a pessoa não usou).
+      const foreign = /[Ѐ-ӿ֐-ۿ฀-๿぀-ヿ㐀-鿿가-힯]/;
+      if (title.length > 120 || (foreign.test(title) && !foreign.test(String(ctx.userMessage || "")))) continue;
+      r.title = title;
+    }
     const start = typeof a.start === "string" ? localToUTC(a.start, tz, ctx.now) : null;
     if (start) r.start = isoNoMillis(start);
     if (Number.isFinite(a.durationMinutes)) r.durationMinutes = Math.round(a.durationMinutes);
